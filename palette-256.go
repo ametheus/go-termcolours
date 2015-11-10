@@ -84,9 +84,20 @@ func (c C256) RGBA() (r, g, b, a uint32) {
 
 func Convert256(col color.Color) C256 {
 	r, g, b, _ := col.RGBA()
-	mp := (0xffff / 12) - 1
 
-	return Colour256(((int(r)*6)+mp)/0xffff, ((int(g)*6)+mp)/0xffff, ((int(b)*6)+mp)/0xffff)
+	// Detect greyscale colours
+	rr := r + g + b/3
+	rr2 := (rr * rr) << 8
+	d1 := ((r - g) * (r - g)) / rr2
+	d2 := ((r - b) * (r - b)) / rr2
+	d3 := ((g - b) * (g - b)) / rr2
+	if d1 < 16 && d2 < 16 && d3 < 60 {
+		return C256(232 + (rr*24)/0x10000)
+	}
+
+	// Fall back to the colour cube.
+	// TODO: figure out a way to include values 0-16
+	return Colour256((int(r)*6)/0x10000, (int(g)*6)/0x10000, (int(b)*6)/0x10000)
 }
 
 func Foreground8(colour C256, s string) string {
