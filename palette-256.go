@@ -68,9 +68,9 @@ func (c C256) RGBA() (r, g, b, a uint32) {
 			return 0xeeee, 0xeeee, 0xecec, 0
 		}
 	} else if c < 232 {
-		b = (uint32(c%6) * 0xffff) / 6
-		g = (uint32((c/6)%6) * 0xffff) / 6
-		r = (uint32((c/36)%6) * 0xffff) / 6
+		b = (uint32((c-16)%6) * 0xffff) / 6
+		g = (uint32(((c-16)/6)%6) * 0xffff) / 6
+		r = (uint32(((c-16)/36)%6) * 0xffff) / 6
 		a = 0
 	} else {
 		r = (uint32(c-232) * 0xffff) / 24
@@ -82,22 +82,29 @@ func (c C256) RGBA() (r, g, b, a uint32) {
 	return
 }
 
+func adiff(a, b uint32) uint32 {
+	if a < b {
+		return b - a
+	}
+	return a - b
+}
+
 func Convert256(col color.Color) C256 {
 	r, g, b, _ := col.RGBA()
 
 	// Detect greyscale colours
 	rr := r + g + b/3
-	rr2 := (rr * rr) << 8
-	d1 := ((r - g) * (r - g)) / rr2
-	d2 := ((r - b) * (r - b)) / rr2
-	d3 := ((g - b) * (g - b)) / rr2
-	if d1 < 16 && d2 < 16 && d3 < 60 {
+	rr2 := rr >> 8
+	d1 := adiff(r, g) / rr2
+	d2 := adiff(r, b) / rr2
+	d3 := adiff(g, b) / rr2
+	if d1 < 8 && d2 < 8 && d3 < 8 {
 		return C256(232 + (rr*24)/0x10000)
 	}
 
 	// Fall back to the colour cube.
 	// TODO: figure out a way to include values 0-16
-	return Colour256((int(r)*6)/0x10000, (int(g)*6)/0x10000, (int(b)*6)/0x10000)
+	return Colour256((int(r)*6)/0x0ffff, (int(g)*6)/0x0ffff, (int(b)*6)/0x0ffff)
 }
 
 func Foreground8(colour C256, s string) string {
