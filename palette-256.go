@@ -94,7 +94,7 @@ func Convert256(col color.Color) C256 {
 
 	// Detect greyscale colours
 	rr := r + g + b/3
-	rr2 := rr >> 8
+	rr2 := (rr >> 8) + 1
 	d1 := adiff(r, g) / rr2
 	d2 := adiff(r, b) / rr2
 	d3 := adiff(g, b) / rr2
