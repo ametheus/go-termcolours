@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	tc "github.com/ametheus/go-termcolours"
+	tc "github.com/thijzert/go-termcolours"
 	"image"
 	"image/color"
 	_ "image/jpeg"

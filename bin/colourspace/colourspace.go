@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	tc "github.com/ametheus/go-termcolours"
+	tc "github.com/thijzert/go-termcolours"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"flag"
-	"github.com/ametheus/go-termcolours/timelog"
+	"github.com/thijzert/go-termcolours/timelog"
 	"log"
 	"os"
 	"time"

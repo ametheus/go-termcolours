@@ -2,8 +2,8 @@ package timelog
 
 import (
 	"fmt"
-	tc "github.com/ametheus/go-termcolours"
-	"github.com/ametheus/go-termcolours/heatmap"
+	tc "github.com/thijzert/go-termcolours"
+	"github.com/thijzert/go-termcolours/heatmap"
 	"io"
 	"time"
 )

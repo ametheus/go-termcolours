@@ -7,7 +7,7 @@ Installation
 ------------
 
 ```
-go get -u github.com/ametheus/go-termcolours
+go get -u github.com/thijzert/go-termcolours
 ```
 
 Usage
@@ -18,7 +18,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/ametheus/go-termcolours" tc
+	"github.com/thijzert/go-termcolours" tc
 )
 
 func main() {
