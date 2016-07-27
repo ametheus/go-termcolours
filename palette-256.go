@@ -54,17 +54,17 @@ func (c C256) RGBA() (r, g, b, a uint32) {
 			return 0x5555, 0x5757, 0x5353, 0
 		} else if c == 9 {
 			return 0xefef, 0x2929, 0x2929, 0
-		} else if c == 1 {
+		} else if c == 10 {
 			return 0x8a8a, 0xe2e2, 0x3434, 0
-		} else if c == 1 {
+		} else if c == 11 {
 			return 0xfcfc, 0xe9e9, 0x4f4f, 0
-		} else if c == 1 {
+		} else if c == 12 {
 			return 0x7272, 0x9f9f, 0xcfcf, 0
-		} else if c == 1 {
+		} else if c == 13 {
 			return 0xadad, 0x7f7f, 0xa8a8, 0
-		} else if c == 1 {
+		} else if c == 14 {
 			return 0x3434, 0xe2e2, 0xe2e2, 0
-		} else if c == 1 {
+		} else if c == 15 {
 			return 0xeeee, 0xeeee, 0xecec, 0
 		}
 	} else if c < 232 {
