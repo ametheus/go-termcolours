@@ -101,7 +101,7 @@ func boundbox(imgx, imgy, bx, by int) (x, y int) {
 	}
 
 	term_aspect := float64(by) / float64(bx)
-	aspect := *text_aspect * (float64(imgy) / float64(imgx))
+	aspect := (float64(imgy) / float64(imgx)) / *text_aspect
 
 	if aspect >= term_aspect {
 		y = by
