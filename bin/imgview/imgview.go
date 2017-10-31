@@ -200,7 +200,7 @@ func Write8(i image.Image) {
 				c1 = iget(i, bounds, x, y+1)
 			}
 
-			fmt.Print(tc.Background8(c1, tc.Foreground24(c0, BLOCK)))
+			fmt.Print(tc.Background8(c1, tc.Foreground8(c0, BLOCK)))
 		}
 		fmt.Print("\n")
 	}
