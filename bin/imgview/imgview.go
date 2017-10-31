@@ -189,18 +189,31 @@ func iget(i image.Image, bounds image.Rectangle, x, y int) tc.C256 {
 	return aft
 }
 
-func Write8(i image.Image) {
-	var c0, c1 tc.C256
-	bounds := i.Bounds()
-	for y := bounds.Min.Y; y < bounds.Max.Y; y += 2 {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			c0 = iget(i, bounds, x, y)
-			c1 = 232
-			if (y + 1) < bounds.Max.Y {
-				c1 = iget(i, bounds, x, y+1)
-			}
+func Write8(img image.Image) {
+	bounds := img.Bounds()
+	prevline := make([]tc.C256, bounds.Max.X-bounds.Min.X)
 
-			fmt.Print(tc.Background8(c1, tc.Foreground8(c0, BLOCK)))
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		i := y - bounds.Min.Y
+
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			j := x - bounds.Min.X
+
+			c0 := iget(img, bounds, x, y)
+			if i%2 == 0 {
+				prevline[j] = c0
+			} else {
+				fmt.Print(tc.Background8(c0, tc.Foreground8(prevline[j], BLOCK)))
+			}
+		}
+		if i%2 == 1 {
+			fmt.Print("\n")
+		}
+	}
+
+	if (bounds.Max.Y-bounds.Min.Y)%2 == 1 {
+		for _, c0 := range prevline {
+			fmt.Print(tc.Foreground8(c0, BLOCK))
 		}
 		fmt.Print("\n")
 	}
