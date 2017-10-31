@@ -150,7 +150,14 @@ func pos(a, b int32) uint32 {
 	return uint32(a)
 }
 
-func iadd(i image.Image, x, y int, dR, dG, dB int32, multiplier float64) {
+func iadd(i image.Image, bounds image.Rectangle, x, y int, dR, dG, dB int32, multiplier float64) {
+	if x < bounds.Min.X || x >= bounds.Max.X {
+		return
+	}
+	if y < bounds.Min.Y || y >= bounds.Max.Y {
+		return
+	}
+
 	col := i.At(x, y)
 
 	r, g, b, _ := col.RGBA()
@@ -168,18 +175,10 @@ func iget(i image.Image, bounds image.Rectangle, x, y int) tc.C256 {
 
 	dr, dg, db := cdiff(col, aft)
 
-	if (x + 1) < bounds.Max.X {
-		iadd(i, x+1, y, dr, db, dg, 7.0/16.0)
-		if (y + 1) < bounds.Max.Y {
-			iadd(i, x+1, y+1, dr, db, dg, 1.0/16.0)
-		}
-	}
-	if (y + 1) < bounds.Max.Y {
-		iadd(i, x, y+1, dr, db, dg, 5.0/16.0)
-		if (x - 1) >= bounds.Min.X {
-			iadd(i, x-1, y+1, dr, db, dg, 3.0/16.0)
-		}
-	}
+	iadd(i, bounds, x+1, y, dr, db, dg, 7.0/16.0)
+	iadd(i, bounds, x+1, y+1, dr, db, dg, 1.0/16.0)
+	iadd(i, bounds, x, y+1, dr, db, dg, 5.0/16.0)
+	iadd(i, bounds, x-1, y+1, dr, db, dg, 3.0/16.0)
 
 	return aft
 }
