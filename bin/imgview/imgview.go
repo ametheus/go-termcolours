@@ -147,6 +147,9 @@ func pos(a, b int32) uint32 {
 	if a < 0 {
 		return 0
 	}
+	if a > 0xffff {
+		return 0xffff
+	}
 	return uint32(a)
 }
 
@@ -165,7 +168,7 @@ func iadd(i image.Image, bounds image.Rectangle, x, y int, dR, dG, dB int32, mul
 	g = pos(int32(g), int32(float64(dG)*multiplier))
 	b = pos(int32(b), int32(float64(dB)*multiplier))
 
-	cnew := color.RGBA{uint8(r >> 8), uint8(g >> 8), uint8(b >> 8), 0}
+	cnew := color.RGBA{uint8(r >> 8), uint8(g >> 8), uint8(b >> 8), 0xff}
 	i.(*image.RGBA).Set(x, y, cnew)
 }
 
@@ -175,10 +178,10 @@ func iget(i image.Image, bounds image.Rectangle, x, y int) tc.C256 {
 
 	dr, dg, db := cdiff(col, aft)
 
-	iadd(i, bounds, x+1, y, dr, db, dg, 7.0/16.0)
-	iadd(i, bounds, x+1, y+1, dr, db, dg, 1.0/16.0)
-	iadd(i, bounds, x, y+1, dr, db, dg, 5.0/16.0)
-	iadd(i, bounds, x-1, y+1, dr, db, dg, 3.0/16.0)
+	iadd(i, bounds, x+1, y+0, dr, db, dg, 0.8*7.0/16.0)
+	iadd(i, bounds, x+1, y+1, dr, db, dg, 0.8*1.0/16.0)
+	iadd(i, bounds, x+0, y+1, dr, db, dg, 0.8*5.0/16.0)
+	iadd(i, bounds, x-1, y+1, dr, db, dg, 0.8*3.0/16.0)
 
 	return aft
 }
