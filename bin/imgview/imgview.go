@@ -9,12 +9,17 @@ import (
 	_ "image/png"
 	"log"
 	"os"
+	"syscall"
+
+	"github.com/nfnt/resize"
+	"golang.org/x/crypto/ssh/terminal"
 
 	tc "github.com/thijzert/go-termcolours"
 )
 
 var (
-	use_24bit = flag.Bool("use_24bit", false, "Use 24-bit colours")
+	text_aspect = flag.Float64("text_aspect", 0.944444, "Aspect ratio for your terminal font")
+	use_24bit   = flag.Bool("use_24bit", false, "Use 24-bit colours")
 )
 
 const BLOCK = "\xe2\x96\x80"
@@ -24,6 +29,14 @@ func init() {
 }
 
 func main() {
+	termx, termy, err := terminal.GetSize(syscall.Stdout)
+	if err != nil {
+		log.Print(err)
+		termx, termy = 80, 25
+	}
+	// We can stack two pixels in one character
+	termy *= 2
+
 	for _, image_file := range flag.Args() {
 		reader, err := os.Open(image_file)
 		if err != nil {
@@ -35,19 +48,67 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		bounds := m.Bounds()
 
+		bounds := m.Bounds()
 		fmt.Printf("Image is %s by %s pixels wide\n", tc.Green(fmt.Sprintf("%d", bounds.Max.X)), tc.Green(fmt.Sprintf("%d", bounds.Max.Y)))
 
+		nx, ny := boundbox(bounds.Max.X, bounds.Max.Y, termx, termy)
+		mm := resize.Resize(uint(nx), uint(ny), convertRGBA(m), resize.Lanczos3)
+
+		bounds = mm.Bounds()
+		fmt.Printf("Image is now %s by %s pixels wide\n", tc.Green(fmt.Sprintf("%d", bounds.Max.X)), tc.Green(fmt.Sprintf("%d", bounds.Max.Y)))
+
 		if *use_24bit {
-			Write24(m, bounds)
+			Write24(mm)
 		} else {
-			Write8(m, bounds)
+			Write8(mm)
 		}
 	}
 }
 
-func Write24(i image.Image, bounds image.Rectangle) {
+func convertRGBA(in image.Image) image.Image {
+	if m, ok := in.(*image.RGBA); ok {
+		return m
+	}
+
+	bounds := in.Bounds()
+
+	m := image.NewRGBA(bounds)
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			m.Set(x, y, in.At(x, y))
+		}
+	}
+	return m
+}
+
+func boundbox(imgx, imgy, bx, by int) (x, y int) {
+	if imgx < 1 || imgy < 1 || bx < 1 || by < 1 {
+		return 1, 1
+	}
+
+	term_aspect := float64(by) / float64(bx)
+	aspect := *text_aspect * (float64(imgy) / float64(imgx))
+
+	if aspect >= term_aspect {
+		y = by
+		x = int((float64(by) / aspect) + 0.5)
+		if x > bx {
+			x = bx
+		}
+	} else {
+		x = bx
+		// We can stack two pixels in one character
+		y = 2 * int((float64(bx)*aspect*0.5)+0.5)
+		if y > by {
+			y = by
+		}
+	}
+	return
+}
+
+func Write24(i image.Image) {
+	bounds := i.Bounds()
 	var c0, c1 color.Color
 	for y := bounds.Min.Y; y < bounds.Max.Y; y += 2 {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
@@ -115,8 +176,9 @@ func iget(i image.Image, bounds image.Rectangle, x, y int) tc.C256 {
 	return aft
 }
 
-func Write8(i image.Image, bounds image.Rectangle) {
+func Write8(i image.Image) {
 	var c0, c1 tc.C256
+	bounds := i.Bounds()
 	for y := bounds.Min.Y; y < bounds.Max.Y; y += 2 {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			c0 = iget(i, bounds, x, y)
