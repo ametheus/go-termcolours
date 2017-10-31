@@ -63,13 +63,9 @@ func main() {
 		}
 
 		bounds := m.Bounds()
-		fmt.Printf("Image is %s by %s pixels wide\n", tc.Green(fmt.Sprintf("%d", bounds.Max.X)), tc.Green(fmt.Sprintf("%d", bounds.Max.Y)))
 
 		nx, ny := boundbox(bounds.Max.X, bounds.Max.Y, termx, termy)
 		mm := resize.Resize(uint(nx), uint(ny), convertRGBA(m), resize.Lanczos3)
-
-		bounds = mm.Bounds()
-		fmt.Printf("Image is now %s by %s pixels wide\n", tc.Green(fmt.Sprintf("%d", bounds.Max.X)), tc.Green(fmt.Sprintf("%d", bounds.Max.Y)))
 
 		if *use_24bit {
 			Write24(mm)
