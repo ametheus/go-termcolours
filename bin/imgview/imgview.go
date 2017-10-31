@@ -18,8 +18,10 @@ import (
 )
 
 var (
-	text_aspect = flag.Float64("text_aspect", 0.944444, "Aspect ratio for your terminal font")
-	use_24bit   = flag.Bool("use_24bit", false, "Use 24-bit colours")
+	text_aspect  = flag.Float64("text_aspect", 0.944444, "Aspect ratio for your terminal font")
+	use_24bit    = flag.Bool("use_24bit", false, "Use 24-bit colours")
+	force_width  = flag.Int("width", 0, "Force output width")
+	force_height = flag.Int("height", 0, "Force output height")
 )
 
 const BLOCK = "\xe2\x96\x80"
@@ -29,11 +31,22 @@ func init() {
 }
 
 func main() {
-	termx, termy, err := terminal.GetSize(syscall.Stdout)
-	if err != nil {
-		log.Print(err)
-		termx, termy = 80, 25
+	var err error
+	termx, termy := *force_width, *force_height
+	if termx == 0 && termy == 0 {
+		termx, termy, err = terminal.GetSize(syscall.Stdout)
+		if err != nil {
+			log.Print(err)
+			termx, termy = 80, 25
+		}
+	} else {
+		if termx == 0 {
+			termx = termy * 1000
+		} else if termy == 0 {
+			termy = termx * 1000
+		}
 	}
+
 	// We can stack two pixels in one character
 	termy *= 2
 
