@@ -178,10 +178,18 @@ func iget(i image.Image, bounds image.Rectangle, x, y int) tc.C256 {
 
 	dr, dg, db := cdiff(col, aft)
 
-	iadd(i, bounds, x+1, y+0, dr, db, dg, 0.8*7.0/16.0)
-	iadd(i, bounds, x+1, y+1, dr, db, dg, 0.8*1.0/16.0)
-	iadd(i, bounds, x+0, y+1, dr, db, dg, 0.8*5.0/16.0)
-	iadd(i, bounds, x-1, y+1, dr, db, dg, 0.8*3.0/16.0)
+	iadd(i, bounds, x+1, y+0, dr, db, dg, 7.0/48.0)
+	iadd(i, bounds, x+2, y+0, dr, db, dg, 5.0/48.0)
+	iadd(i, bounds, x-2, y+1, dr, db, dg, 3.0/48.0)
+	iadd(i, bounds, x-1, y+1, dr, db, dg, 5.0/48.0)
+	iadd(i, bounds, x+0, y+1, dr, db, dg, 7.0/48.0)
+	iadd(i, bounds, x+1, y+1, dr, db, dg, 5.0/48.0)
+	iadd(i, bounds, x+2, y+1, dr, db, dg, 3.0/48.0)
+	iadd(i, bounds, x-2, y+2, dr, db, dg, 1.0/48.0)
+	iadd(i, bounds, x-1, y+2, dr, db, dg, 3.0/48.0)
+	iadd(i, bounds, x+0, y+2, dr, db, dg, 5.0/48.0)
+	iadd(i, bounds, x+1, y+2, dr, db, dg, 3.0/48.0)
+	iadd(i, bounds, x+2, y+2, dr, db, dg, 1.0/48.0)
 
 	return aft
 }
