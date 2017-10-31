@@ -3,18 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	tc "github.com/thijzert/go-termcolours"
 	"image"
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
 	"log"
 	"os"
+
+	tc "github.com/thijzert/go-termcolours"
 )
 
 var (
-	image_file = flag.String("image_file", "", "The image file to display")
-	use_24bit  = flag.Bool("use_24bit", true, "Use 24-bit colours")
+	use_24bit = flag.Bool("use_24bit", false, "Use 24-bit colours")
 )
 
 const BLOCK = "\xe2\x96\x80"
@@ -24,24 +24,26 @@ func init() {
 }
 
 func main() {
-	reader, err := os.Open(*image_file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer reader.Close()
+	for _, image_file := range flag.Args() {
+		reader, err := os.Open(image_file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer reader.Close()
 
-	m, _, err := image.Decode(reader)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bounds := m.Bounds()
+		m, _, err := image.Decode(reader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bounds := m.Bounds()
 
-	fmt.Printf("Image is %s by %s pixels wide\n", tc.Green(fmt.Sprintf("%d", bounds.Max.X)), tc.Green(fmt.Sprintf("%d", bounds.Max.Y)))
+		fmt.Printf("Image is %s by %s pixels wide\n", tc.Green(fmt.Sprintf("%d", bounds.Max.X)), tc.Green(fmt.Sprintf("%d", bounds.Max.Y)))
 
-	if *use_24bit {
-		Write24(m, bounds)
-	} else {
-		Write8(m, bounds)
+		if *use_24bit {
+			Write24(m, bounds)
+		} else {
+			Write8(m, bounds)
+		}
 	}
 }
 
