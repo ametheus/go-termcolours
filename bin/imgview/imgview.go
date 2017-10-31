@@ -36,7 +36,6 @@ func main() {
 	if termx == 0 && termy == 0 {
 		termx, termy, err = terminal.GetSize(syscall.Stdout)
 		if err != nil {
-			log.Print(err)
 			termx, termy = 80, 25
 		}
 	} else {
